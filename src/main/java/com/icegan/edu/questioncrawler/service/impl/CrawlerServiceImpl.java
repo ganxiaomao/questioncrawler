@@ -152,7 +152,7 @@ public class CrawlerServiceImpl implements ICrawlerService {
     }
 
     public void extractChoice(Element el){
-        StringBuffer stems = new StringBuffer();
+        StringBuffer stems = new StringBuffer();//用来保存题干
         List<Element> choices = new ArrayList<>();
         Elements children = el.children();
         Iterator<Element> it = children.iterator();
@@ -166,7 +166,7 @@ public class CrawlerServiceImpl implements ICrawlerService {
                 if(m.matches()){
                     //
                 }else {
-                    e.html();
+                    stems.append(e.html());
                 }
             }
         }
