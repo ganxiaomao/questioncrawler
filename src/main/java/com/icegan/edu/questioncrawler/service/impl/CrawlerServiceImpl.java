@@ -24,6 +24,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 public class CrawlerServiceImpl implements ICrawlerService {
@@ -98,6 +100,7 @@ public class CrawlerServiceImpl implements ICrawlerService {
             if(ps.size()>1){
                 Element choice = ps.get(1);//获取选项
                 coocoQuestion.setQuestion(stem.html()+choice.html());
+                logger.info("选项"+choice.text());
             }
 
 
@@ -146,5 +149,26 @@ public class CrawlerServiceImpl implements ICrawlerService {
         }
         logger.info("题目数量="+elements.size());
         return result;
+    }
+
+    public void extractChoice(Element el){
+        StringBuffer stems = new StringBuffer();
+        List<Element> choices = new ArrayList<>();
+        Elements children = el.children();
+        Iterator<Element> it = children.iterator();
+        while(it.hasNext()){
+            Element e = it.next();
+            String tagName = e.tagName();
+            if(!tagName.equals("div")){
+                String text = e.text();
+                Pattern pattern = Pattern.compile("[A-Z]{2,}");
+                Matcher m = pattern.matcher(text);
+                if(m.matches()){
+                    //
+                }else {
+                    e.html();
+                }
+            }
+        }
     }
 }

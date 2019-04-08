@@ -4,7 +4,7 @@ import lombok.Data;
 
 import java.io.Serializable;
 
-@Data
+
 public class CoocoQuestion implements Serializable {
     private String question;//题目
     private String answer;//解答
@@ -13,6 +13,62 @@ public class CoocoQuestion implements Serializable {
     private String answerId;//答案的id
     private String type;//题目类型
     private String knowlege;//知识点
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public void setQuestion(String question) {
+        this.question = question;
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
+
+    public String getFrom() {
+        return from;
+    }
+
+    public void setFrom(String from) {
+        this.from = from;
+    }
+
+    public String getDifficult() {
+        return difficult;
+    }
+
+    public void setDifficult(String difficult) {
+        this.difficult = difficult;
+    }
+
+    public String getAnswerId() {
+        return answerId;
+    }
+
+    public void setAnswerId(String answerId) {
+        this.answerId = answerId;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getKnowlege() {
+        return knowlege;
+    }
+
+    public void setKnowlege(String knowlege) {
+        this.knowlege = knowlege;
+    }
 
     @Override
     public String toString() {
