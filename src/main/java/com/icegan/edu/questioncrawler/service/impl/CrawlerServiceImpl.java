@@ -95,13 +95,8 @@ public class CrawlerServiceImpl implements ICrawlerService {
             Element from = titles.get(1).select("span").get(0);//获取题目来源
             coocoQuestion.setFrom(from.text());
 
-            Element stem = ps.get(0);//获取题干
-            coocoQuestion.setQuestion(stem.html());
-            if(ps.size()>1){
-                Element choice = ps.get(1);//获取选项
-                coocoQuestion.setQuestion(stem.html()+choice.html());
-                logger.info("选项"+choice.text());
-            }
+            String stem = extractStem(txts.first());//获取题干
+            coocoQuestion.setQuestion(stem);
 
 
             Element answer = txts.select("div[class=daan]").get(0);//获取答案id
@@ -151,24 +146,19 @@ public class CrawlerServiceImpl implements ICrawlerService {
         return result;
     }
 
-    public void extractChoice(Element el){
+    public String extractStem(Element el){
         StringBuffer stems = new StringBuffer();//用来保存题干
-        List<Element> choices = new ArrayList<>();
         Elements children = el.children();
         Iterator<Element> it = children.iterator();
         while(it.hasNext()){
             Element e = it.next();
             String tagName = e.tagName();
-            if(!tagName.equals("div")){
-                String text = e.text();
-                Pattern pattern = Pattern.compile("[A-Z]{2,}");
-                Matcher m = pattern.matcher(text);
-                if(m.matches()){
-                    //
-                }else {
-                    stems.append(e.html());
-                }
+            if((tagName.equals("div")&&!e.hasAttr("class"))||(!tagName.equals("div"))){
+                //Pattern pattern = Pattern.compile(".*[A-Z]+.*[A-Z]+.*");
+                //Matcher m = pattern.matcher(text);
+                stems.append(e.html());
             }
         }
+        return stems.toString();
     }
 }

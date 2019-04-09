@@ -16,5 +16,5 @@ mybatis-plus:
   global-config:
     db-config:
       id-type: uuid
-  mapper-locations: classpath:**/mapper/*.xml
+  mapper-locations: classpath*:**/mapper/*Mapper.xml  #写成classpath*:**/mapper/*.xml会把tomcat下的包含mapper路径的xml文件也囊括进来，所以要注意，或者最好给你的xml一个统一的后缀，比如**Mapper.xml
   type-aliases-package: com.icegan.edu.questioncrawler.model
