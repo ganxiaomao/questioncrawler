@@ -1,0 +1,73 @@
+package com.icegan.edu.questioncrawler.util;
+
+import org.apache.http.HttpEntity;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+public class HttpUtils {
+    private static final Logger logger = LogManager.getLogger(HttpUtils.class);
+
+    public static String httpPost(String url, Map<String,String> params) throws IOException {
+        String result = "";
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(url);
+        httpPost.setHeader("Content-type", "text/html; charset=utf-8");
+        List<NameValuePair> nvps = new ArrayList<>();
+        if(params != null){
+            Iterator<Map.Entry<String,String>> it = params.entrySet().iterator();
+            while(it.hasNext()){
+                Map.Entry<String,String> next = it.next();
+                nvps.add(new BasicNameValuePair(next.getKey(),next.getValue()));
+            }
+        }
+        CloseableHttpResponse response = null;
+        try {
+            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
+            response = httpClient.execute(httpPost);
+            logger.info(response.getStatusLine());
+            HttpEntity entity = response.getEntity();
+            result= EntityUtils.toString(entity);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } finally {
+            httpClient.close();
+        }
+        return result;
+    }
+
+    public static String httpGet(String url) throws IOException {
+        String result = "";
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpGet httpGet = new HttpGet(url);
+        CloseableHttpResponse response = null;
+        try {
+            response = httpClient.execute(httpGet);
+            HttpEntity entity = response.getEntity();
+            result= EntityUtils.toString(entity);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            httpClient.close();
+        }
+        return result;
+    }
+}

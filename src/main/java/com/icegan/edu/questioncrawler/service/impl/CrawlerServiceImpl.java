@@ -1,7 +1,10 @@
 package com.icegan.edu.questioncrawler.service.impl;
 
 import com.icegan.edu.questioncrawler.model.CoocoQuestion;
+import com.icegan.edu.questioncrawler.model.CrawlUrl;
 import com.icegan.edu.questioncrawler.service.ICrawlerService;
+import com.icegan.edu.questioncrawler.util.HttpUtils;
+import com.icegan.edu.questioncrawler.util.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -19,6 +22,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -31,37 +35,59 @@ import java.util.regex.Pattern;
 public class CrawlerServiceImpl implements ICrawlerService {
     private static final Logger logger = LogManager.getLogger(CrawlerServiceImpl.class);
     @Override
-    public String coocoCrawler() throws IOException {
+    public String coocoCrawler() {
         //
         String html = "";
-        CloseableHttpClient httpClient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost("http://czsx.cooco.net.cn/testpage/1/?lessonid=111&difficult=0&type=0&orderby=1");
-        httpPost.setHeader("Content-type", "text/html; charset=utf-8");
-        List<NameValuePair> nvps = new ArrayList<>();
-//        nvps.add(new BasicNameValuePair("lessonid","111"));
-//        nvps.add(new BasicNameValuePair("difficult","0"));
-//        nvps.add(new BasicNameValuePair("type","0"));
-//        nvps.add(new BasicNameValuePair("orderby","1"));
-
-        CloseableHttpResponse response = null;
+        String url = "http://czsx.cooco.net.cn/testpage/1/?lessonid=111&difficult=0&type=0&orderby=1";
         try {
-            httpPost.setEntity(new UrlEncodedFormEntity(nvps));
-            response = httpClient.execute(httpPost);
-            logger.info(response.getStatusLine());
-            HttpEntity entity = response.getEntity();
-            html=EntityUtils.toString(entity);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
+            html = HttpUtils.httpPost(url,null);
+        } catch (IOException e) {
+            logger.info(e);
+        }
+        return html;
+    }
+
+    @Override
+    public String coocoCrawlSubject(String subject) {
+        String url = "http://"+subject+".cooco.net.cn/test/";
+        String html = "";
+        try {
+            html = HttpUtils.httpGet(url);
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            if(response != null)
-                response.close();
         }
-        html = parseHtml(html);
         return html;
+    }
+
+    @Override
+    public String coocoCrawlPage(String grade,String subject) {
+        String url = "http://"+grade+subject+".cooco.net.cn/test/";
+        String html = "";
+        try {
+            html = HttpUtils.httpGet(url);
+            Document doc = Jsoup.parse(html);
+            Elements pages = doc.select("p.pagenav a.page-numbers");
+            int pageNum = -1;
+            int size = pages.size();
+            if(size > 0){
+                Element lastPage = pages.last();
+                String text = lastPage.text();
+                pageNum = StringUtils.convertString2Int(text);
+            }
+            List<CrawlUrl> pageUrls = new ArrayList<>();
+            if(pageNum > 0){
+                for(int i=0; i<pageNum; i++){
+                    CrawlUrl crawlUrl = new CrawlUrl();
+                    crawlUrl.setGrade("");
+                    crawlUrl.setStatus(0);
+                    crawlUrl.setSubject("");
+                    crawlUrl.setUrl("http://"+grade+subject+".cooco.net.cn/testpage/"+i+"/");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     String parseHtml(String html){
