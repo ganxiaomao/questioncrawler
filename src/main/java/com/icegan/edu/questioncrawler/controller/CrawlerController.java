@@ -21,7 +21,7 @@ public class CrawlerController {
     }
 
     @RequestMapping("/knowlege")
-    public String knowlege(@RequestParam(name = "subject") String subject){
-        return iCrawlerService.coocoCrawlSubject(subject);
+    public String knowlege(@RequestParam(name = "grade") String grade,@RequestParam(name = "subject") String subject){
+        return iCrawlerService.coocoCrawlPage(grade,subject);
     }
 }

@@ -2,6 +2,7 @@ package com.icegan.edu.questioncrawler.service.impl;
 
 import com.icegan.edu.questioncrawler.model.CoocoQuestion;
 import com.icegan.edu.questioncrawler.model.CrawlUrl;
+import com.icegan.edu.questioncrawler.service.ICrawlUrlService;
 import com.icegan.edu.questioncrawler.service.ICrawlerService;
 import com.icegan.edu.questioncrawler.util.HttpUtils;
 import com.icegan.edu.questioncrawler.util.StringUtils;
@@ -20,6 +21,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
@@ -34,6 +36,10 @@ import java.util.regex.Pattern;
 @Service
 public class CrawlerServiceImpl implements ICrawlerService {
     private static final Logger logger = LogManager.getLogger(CrawlerServiceImpl.class);
+
+    @Autowired
+    private ICrawlUrlService iCrawlUrlService;
+
     @Override
     public String coocoCrawler() {
         //
@@ -78,16 +84,18 @@ public class CrawlerServiceImpl implements ICrawlerService {
             if(pageNum > 0){
                 for(int i=0; i<pageNum; i++){
                     CrawlUrl crawlUrl = new CrawlUrl();
-                    crawlUrl.setGrade("");
+                    crawlUrl.setGrade(grade);
                     crawlUrl.setStatus(0);
-                    crawlUrl.setSubject("");
+                    crawlUrl.setSubject(subject);
                     crawlUrl.setUrl("http://"+grade+subject+".cooco.net.cn/testpage/"+i+"/");
+                    pageUrls.add(crawlUrl);
                 }
             }
+            iCrawlUrlService.saveBatch(pageUrls);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return html;
     }
 
     String parseHtml(String html){
