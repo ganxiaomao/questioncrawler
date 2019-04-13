@@ -22,7 +22,7 @@ public class CrawlUrl extends Model<CrawlUrl> {
     private String grade;
 
     @TableField("status")
-    private int status;//0,未处理；1，抓取完成；-1，抓取失败。
+    private Integer status;//0,未处理；1，抓取完成；-1，抓取失败。
 
     public String getId() {
         return id;
@@ -56,11 +56,11 @@ public class CrawlUrl extends Model<CrawlUrl> {
         this.grade = grade;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
