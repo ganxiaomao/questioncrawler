@@ -8,4 +8,6 @@ import java.util.List;
 public interface ICrawlUrlService extends IService<CrawlUrl> {
 
     public List<CrawlUrl> selectByPageAndStatus(int pageNum, int pageSize, List<Integer> statuss);
+
+    public CrawlUrl selectOneByStatus(Integer... status);
 }

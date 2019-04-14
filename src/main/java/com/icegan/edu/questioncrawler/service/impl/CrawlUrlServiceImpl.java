@@ -26,4 +26,14 @@ public class CrawlUrlServiceImpl extends ServiceImpl<CrawlUrlMapper, CrawlUrl> i
         this.baseMapper.selectPage(page,queryWrapper.in("status",statuss));
         return page.getRecords();
     }
+
+    @Override
+    public CrawlUrl selectOneByStatus(Integer... status) {
+        QueryWrapper<CrawlUrl> queryWrapper = new QueryWrapper<>();
+        List<CrawlUrl> datas = this.baseMapper.selectList(queryWrapper.in("status",status).last("limit 1"));
+        CrawlUrl cu = null;
+        if(datas != null && !datas.isEmpty())
+            cu = datas.get(0);
+        return cu;
+    }
 }

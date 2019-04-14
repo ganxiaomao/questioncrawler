@@ -2,6 +2,7 @@ package com.icegan.edu.questioncrawler.service.impl;
 
 import com.icegan.edu.questioncrawler.model.CoocoQuestion;
 import com.icegan.edu.questioncrawler.model.CrawlUrl;
+import com.icegan.edu.questioncrawler.model.EduQuestionBankBase;
 import com.icegan.edu.questioncrawler.service.ICrawlUrlService;
 import com.icegan.edu.questioncrawler.service.ICrawlerService;
 import com.icegan.edu.questioncrawler.util.HttpUtils;
@@ -41,16 +42,18 @@ public class CrawlerServiceImpl implements ICrawlerService {
     private ICrawlUrlService iCrawlUrlService;
 
     @Override
-    public String coocoCrawler() {
+    public int coocoCrawler(String url) {
         //
+        int res = 1;//成功
         String html = "";
-        String url = "http://czsx.cooco.net.cn/testpage/1/?lessonid=111&difficult=0&type=0&orderby=1";
         try {
             html = HttpUtils.httpPost(url,null);
-        } catch (IOException e) {
+            List<CoocoQuestion> coocoQuestions = parseHtml(html);
+        } catch (Exception e) {
+            res = -1;//失败
             logger.info(e);
         }
-        return html;
+        return res;
     }
 
     @Override
@@ -98,7 +101,8 @@ public class CrawlerServiceImpl implements ICrawlerService {
         return html;
     }
 
-    String parseHtml(String html){
+    List<CoocoQuestion> parseHtml(String html){
+        List<CoocoQuestion> coocoQuestions = new ArrayList<>();
         String result = "";
         //
         Document doc = Jsoup.parse(html);
@@ -175,9 +179,10 @@ public class CrawlerServiceImpl implements ICrawlerService {
             }
             coocoQuestion.setDifficult(difficult);
             logger.info("题目信息="+coocoQuestion.toString());
+            coocoQuestions.add(coocoQuestion);
         }
-        logger.info("题目数量="+elements.size());
-        return result;
+        logger.info("题目数量="+coocoQuestions.size());
+        return coocoQuestions;
     }
 
     public String extractStem(Element el){
@@ -194,5 +199,14 @@ public class CrawlerServiceImpl implements ICrawlerService {
             }
         }
         return stems.toString();
+    }
+
+    public List<EduQuestionBankBase> convertCoocoQuestion2Edu(List<CoocoQuestion> coocoQuestions){
+        List<EduQuestionBankBase> eduQuestionBankBases = new ArrayList<>();
+        for(CoocoQuestion cq : coocoQuestions){
+            EduQuestionBankBase eq = new EduQuestionBankBase();
+            eduQuestionBankBases.add(eq);
+        }
+        return eduQuestionBankBases;
     }
 }

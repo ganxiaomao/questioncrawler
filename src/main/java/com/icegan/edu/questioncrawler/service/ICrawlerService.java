@@ -3,7 +3,7 @@ package com.icegan.edu.questioncrawler.service;
 import java.io.IOException;
 
 public interface ICrawlerService {
-    String coocoCrawler();
+    int coocoCrawler(String url);
 
     /**
      * 抓取cooco网的知识点各科

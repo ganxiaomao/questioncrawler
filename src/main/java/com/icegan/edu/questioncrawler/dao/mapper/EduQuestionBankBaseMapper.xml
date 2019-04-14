@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icegan.edu.questioncrawler.dao.EduQuestionBankBaseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.icegan.edu.questioncrawler.model.EduQuestionBankBase">
+        <id column="id" property="id" />
+        <result column="stem" property="stem" />
+        <result column="type" property="type" />
+        <result column="subject" property="subject" />
+        <result column="grade" property="grade" />
+        <result column="difficult" property="difficult" />
+        <result column="points" property="points" />
+        <result column="course_id" property="courseId" />
+        <result column="chapter_id" property="chapterId" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="create_by" property="createBy" />
+        <result column="status" property="status" />
+        <result column="analysis" property="analysis" />
+        <result column="answer_id" property="answerId" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, stem, type, subject, grade, difficult, points, course_id, chapter_id, create_time, update_time, create_by, status, analysis, answer_id
+    </sql>
+</mapper>
