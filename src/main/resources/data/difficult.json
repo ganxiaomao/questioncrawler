@@ -1,0 +1,22 @@
+[
+  {
+    "code": "question_difficult_level_base",
+    "name": "基础"
+  },
+  {
+    "code": "question_difficult_level_esay",
+    "name": "容易"
+  },
+  {
+    "code": "question_difficult_level_mid",
+    "name": "中等"
+  },
+  {
+    "code": "question_difficult_level_littlehard",
+    "name": "偏难"
+  },
+  {
+    "code": "question_difficult_level_veryhard",
+    "name": "很难"
+  }
+]

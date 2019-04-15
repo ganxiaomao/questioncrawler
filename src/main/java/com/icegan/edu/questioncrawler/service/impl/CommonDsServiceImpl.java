@@ -31,9 +31,11 @@ public class CommonDsServiceImpl implements ICommonDsService {
         for(CourseSection cs : courseSectionList){
             String id = cs.getId();
             String name = cs.getName();
+            String parentId = cs.getCourseId();
             CourseSectionVo vo = new CourseSectionVo();
             vo.setId(id);
             vo.setName(name);
+            vo.setParentId(parentId);
             map.put(name,vo);
         }
         return map;

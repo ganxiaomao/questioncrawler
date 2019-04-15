@@ -1,5 +1,6 @@
 package com.icegan.edu.questioncrawler.service.impl;
 
+import com.icegan.edu.questioncrawler.constant.Constants;
 import com.icegan.edu.questioncrawler.model.CoocoQuestion;
 import com.icegan.edu.questioncrawler.model.CrawlUrl;
 import com.icegan.edu.questioncrawler.model.EduQuestionBankBase;
@@ -7,6 +8,7 @@ import com.icegan.edu.questioncrawler.service.ICrawlUrlService;
 import com.icegan.edu.questioncrawler.service.ICrawlerService;
 import com.icegan.edu.questioncrawler.util.HttpUtils;
 import com.icegan.edu.questioncrawler.util.StringUtils;
+import com.icegan.edu.questioncrawler.vo.CourseSectionVo;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -29,6 +31,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -42,18 +45,20 @@ public class CrawlerServiceImpl implements ICrawlerService {
     private ICrawlUrlService iCrawlUrlService;
 
     @Override
-    public int coocoCrawler(String url) {
+    public List<EduQuestionBankBase> coocoCrawler(String url, String grade, String subject) {
         //
-        int res = 1;//成功
-        String html = "";
+        List<EduQuestionBankBase> eduQuestionBankBases = new ArrayList<>();
         try {
-            html = HttpUtils.httpPost(url,null);
+            String html = HttpUtils.httpPost(url,null);
             List<CoocoQuestion> coocoQuestions = parseHtml(html);
+            String gradeCode = Constants.gradeMap.get(grade);
+            String subjectCode = Constants.subjectMap.get(subject);
+            eduQuestionBankBases = convertCoocoQuestion2Edu(coocoQuestions, gradeCode, subjectCode);
         } catch (Exception e) {
-            res = -1;//失败
+            eduQuestionBankBases = null;//失败
             logger.info(e);
         }
-        return res;
+        return eduQuestionBankBases;
     }
 
     @Override
@@ -201,10 +206,32 @@ public class CrawlerServiceImpl implements ICrawlerService {
         return stems.toString();
     }
 
-    public List<EduQuestionBankBase> convertCoocoQuestion2Edu(List<CoocoQuestion> coocoQuestions){
+    public List<EduQuestionBankBase> convertCoocoQuestion2Edu(List<CoocoQuestion> coocoQuestions, String gradeCode, String subjectCode){
+        Date now = new Date();
         List<EduQuestionBankBase> eduQuestionBankBases = new ArrayList<>();
         for(CoocoQuestion cq : coocoQuestions){
             EduQuestionBankBase eq = new EduQuestionBankBase();
+            eq.setAnswerId(cq.getAnswerId());
+            //获取知识点相关信息
+            String knowlege = cq.getKnowlege();
+            CourseSectionVo vo = Constants.csvMap.get(knowlege);
+            if(vo != null){
+                eq.setCourseId(vo.getParentId());
+                eq.setChapterId(vo.getId());
+            }else{
+                continue;
+            }
+
+            eq.setCreateBy(1);//创建人：系统管理员
+            eq.setCreateTime(now);
+            eq.setUpdateTime(now);
+            eq.setDifficult(Constants.difficultMap.get(cq.getDifficult()));
+            eq.setGrade(gradeCode);
+            eq.setStatus(Constants.cooco_crawl_question_status_stem_ok);//状态为stem抓取成功
+            eq.setStem(cq.getQuestion());
+            eq.setSubject(subjectCode);
+            eq.setType(Constants.questiontypeMap.get(cq.getType()));
+
             eduQuestionBankBases.add(eq);
         }
         return eduQuestionBankBases;

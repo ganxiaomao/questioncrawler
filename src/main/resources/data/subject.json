@@ -1,0 +1,22 @@
+[
+  {
+    "code": "chinese",
+    "name": "语文"
+  },
+  {
+    "code": "math",
+    "name": "数学"
+  },
+  {
+    "code": "english",
+    "name": "英语"
+  },
+  {
+    "code": "physics",
+    "name": "物理"
+  },
+  {
+    "code": "chemical",
+    "name": "化学"
+  }
+]

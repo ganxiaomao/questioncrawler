@@ -1,6 +1,7 @@
 package com.icegan.edu.questioncrawler.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.icegan.edu.questioncrawler.dao.CrawlUrlMapper;
@@ -35,5 +36,12 @@ public class CrawlUrlServiceImpl extends ServiceImpl<CrawlUrlMapper, CrawlUrl> i
         if(datas != null && !datas.isEmpty())
             cu = datas.get(0);
         return cu;
+    }
+
+    @Override
+    public boolean updateStatusById(Integer status, String id) {
+        UpdateWrapper<CrawlUrl> urlUpdateWrapper = new UpdateWrapper<>();
+        this.baseMapper.update(null, urlUpdateWrapper.set("status", status).eq("id",id));
+        return true;
     }
 }

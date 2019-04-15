@@ -8,9 +8,14 @@ import java.util.Map;
 /**
  * 一些常量
  */
-public class Contants {
+public class Constants {
     //应用初始化的时候，用于保存课程信息，key为知识点名称，value为课程信息结构数据
     public static Map<String, CourseSectionVo> csvMap = new HashMap<>();
+
+    public static Map<String,String> difficultMap = new HashMap<>();//用于保存难度信息
+    public static Map<String,String> gradeMap = new HashMap<>();//用于保存年级信息
+    public static Map<String,String> questiontypeMap = new HashMap<>();//用于保存题目类型信息
+    public static Map<String,String> subjectMap = new HashMap<>();//用于保存学科信息
 
     /**
      * biz_edu_question_bank_base表status的值，只针对cooco网的情况

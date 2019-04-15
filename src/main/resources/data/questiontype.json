@@ -1,0 +1,34 @@
+[
+  {
+    "code": "single_choice",
+    "name": "选择题"
+  },
+  {
+    "code": "multi_choice",
+    "name": "多选题"
+  },
+  {
+    "code": "short_answer",
+    "name": "简答题"
+  },
+  {
+    "code": "completion",
+    "name": "填空题"
+  },
+  {
+    "code": "drawing",
+    "name": "作图题"
+  },
+  {
+    "code": "experiment",
+    "name": "实验探究题"
+  },
+  {
+    "code": "comprehensive",
+    "name": "综合题"
+  },
+  {
+    "code": "computing",
+    "name": "计算题"
+  }
+]

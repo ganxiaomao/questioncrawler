@@ -1,0 +1,14 @@
+[
+  {
+    "code": "grade_primary",
+    "name": "小学"
+  },
+  {
+    "code": "grade_junior",
+    "name": "初中"
+  },
+  {
+    "code": "grade_high",
+    "name": "高中"
+  }
+]
