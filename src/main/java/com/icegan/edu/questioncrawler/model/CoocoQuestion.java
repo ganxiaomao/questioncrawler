@@ -13,6 +13,7 @@ public class CoocoQuestion implements Serializable {
     private String answerId;//答案的id
     private String type;//题目类型
     private String knowlege;//知识点
+    private String originFrom;//来源网站
 
     public String getQuestion() {
         return question;
@@ -70,6 +71,14 @@ public class CoocoQuestion implements Serializable {
         this.knowlege = knowlege;
     }
 
+    public String getOriginFrom() {
+        return originFrom;
+    }
+
+    public void setOriginFrom(String originFrom) {
+        this.originFrom = originFrom;
+    }
+
     @Override
     public String toString() {
         return "CoocoQuestion{" + "\n" +
@@ -80,6 +89,7 @@ public class CoocoQuestion implements Serializable {
                 ", answerId='" + answerId + '\'' + "\n" +
                 ", type='" + type + '\'' + "\n" +
                 ", knowlege='" + knowlege + '\'' + "\n" +
+                ", originFrom='" + originFrom + '\'' + "\n" +
                 '}';
     }
 }

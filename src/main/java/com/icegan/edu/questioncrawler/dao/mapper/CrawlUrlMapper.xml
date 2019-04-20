@@ -9,11 +9,15 @@
         <result column="grade" property="grade" />
         <result column="url" property="url" />
         <result column="status" property="status" />
+        <result column="knowledge_id" property="knowledgeId" />
+        <result column="course_id" property="courseId" />
+        <result column="cooco_id" property="coocoId" />
+        <result column="origin_from" property="originFrom" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, subject, grade, url, status
+        id, subject, grade, url, status, knowledge_id, course_id, cooco_id, origin_from
     </sql>
 
     <select id="listByConditions" resultMap="BaseResultMap">
@@ -28,6 +32,15 @@
         </if>
         <if test="status != null">
             and status = #{status}
+        </if>
+        <if test="knowledgeId != null and knowledgeId != ''">
+            and knowledge_id = #{knowledgeId}
+        </if>
+        <if test="courseId != null and courseId != ''">
+            and course_id = #{courseId}
+        </if>
+        <if test="coocoId != null and coocoId != ''">
+            and cooco_id = #{coocoId}
         </if>
         order by create_time desc
     </select>

@@ -73,14 +73,13 @@ public class EduQuestionBankBase extends Model<EduQuestionBankBase> {
      */
     private Integer status;
     /**
-     * 解析
-     */
-    private String analysis;
-    /**
      * cooco网题目的解析id，抓取用
      */
     @TableField("answer_id")
     private String answerId;
+
+    @TableField("origin_from")
+    private String originFrom;
 
 
     public String getId() {
@@ -179,20 +178,20 @@ public class EduQuestionBankBase extends Model<EduQuestionBankBase> {
         this.status = status;
     }
 
-    public String getAnalysis() {
-        return analysis;
-    }
-
-    public void setAnalysis(String analysis) {
-        this.analysis = analysis;
-    }
-
     public String getAnswerId() {
         return answerId;
     }
 
     public void setAnswerId(String answerId) {
         this.answerId = answerId;
+    }
+
+    public String getOriginFrom() {
+        return originFrom;
+    }
+
+    public void setOriginFrom(String originFrom) {
+        this.originFrom = originFrom;
     }
 
     @Override
@@ -215,8 +214,8 @@ public class EduQuestionBankBase extends Model<EduQuestionBankBase> {
                 ", updateTime=" + updateTime +
                 ", createBy=" + createBy +
                 ", status=" + status +
-                ", analysis=" + analysis +
                 ",answerId=" + answerId +
+                ",originFrom=" + originFrom +
                 "}";
     }
 }

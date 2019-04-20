@@ -17,12 +17,12 @@
         <result column="update_time" property="updateTime" />
         <result column="create_by" property="createBy" />
         <result column="status" property="status" />
-        <result column="analysis" property="analysis" />
         <result column="answer_id" property="answerId" />
+        <result column="origin_from" property="originFrom" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, stem, type, subject, grade, difficult, points, course_id, chapter_id, create_time, update_time, create_by, status, analysis, answer_id
+        id, stem, type, subject, grade, difficult, points, course_id, chapter_id, create_time, update_time, create_by, status, answer_id, origin_from
     </sql>
 </mapper>

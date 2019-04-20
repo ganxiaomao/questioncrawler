@@ -15,11 +15,12 @@
         <result column="update_time" property="updateTime" />
         <result column="creator" property="creator" />
         <result column="updater" property="updater" />
+        <result column="cooco_id" property="coocoId" />
     </resultMap>
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, parent_id, course_id, ilevel, sort_str, name, contect, create_time, update_time, creator, updater
+        id, parent_id, course_id, ilevel, sort_str, name, contect, create_time, update_time, creator, updater, cooco_id
     </sql>
 
 </mapper>

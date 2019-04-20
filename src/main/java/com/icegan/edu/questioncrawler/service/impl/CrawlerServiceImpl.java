@@ -9,6 +9,7 @@ import com.icegan.edu.questioncrawler.service.ICrawlerService;
 import com.icegan.edu.questioncrawler.util.HttpUtils;
 import com.icegan.edu.questioncrawler.util.StringUtils;
 import com.icegan.edu.questioncrawler.vo.CourseSectionVo;
+import org.apache.http.ContentTooLongException;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.ClientProtocolException;
@@ -30,10 +31,7 @@ import org.springframework.stereotype.Service;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,15 +43,13 @@ public class CrawlerServiceImpl implements ICrawlerService {
     private ICrawlUrlService iCrawlUrlService;
 
     @Override
-    public List<EduQuestionBankBase> coocoCrawler(String url, String grade, String subject) {
+    public List<EduQuestionBankBase> coocoCrawler(String url, String grade, String subject, String courseId, String courseSectionId, String originFrom) {
         //
         List<EduQuestionBankBase> eduQuestionBankBases = new ArrayList<>();
         try {
             String html = HttpUtils.httpPost(url,null);
-            List<CoocoQuestion> coocoQuestions = parseHtml(html);
-            String gradeCode = Constants.gradeMap.get(grade);
-            String subjectCode = Constants.subjectMap.get(subject);
-            eduQuestionBankBases = convertCoocoQuestion2Edu(coocoQuestions, gradeCode, subjectCode);
+            List<CoocoQuestion> coocoQuestions = parseHtml(html, originFrom);
+            eduQuestionBankBases = convertCoocoQuestion2Edu(coocoQuestions, grade, subject, courseId, courseSectionId, originFrom);
         } catch (Exception e) {
             eduQuestionBankBases = null;//失败
             logger.info(e);
@@ -74,20 +70,20 @@ public class CrawlerServiceImpl implements ICrawlerService {
     }
 
     @Override
-    public String coocoCrawlPage(String grade,String subject) {
-        String url = "http://"+grade+subject+".cooco.net.cn/test/";
+    public String coocoCrawlPage(String grade,String subject, String knowlegeId, String coocoId, String courseId) {
+        String coocograde = Constants.grade2CoocoMap.get(grade);
+        String coocosubject = Constants.subject2CoocoMap.get(subject);
+        String originFrom = "http://"+coocograde+coocosubject+".cooco.net.cn";//最后不以/结尾，是为了图片地址完善方便
+        String url = originFrom+"/testpage/1/";
+        Map<String,String> params = new HashMap<>();
+        params.put("lessonid",coocoId);
+        params.put("difficult","0");
+        params.put("type","0");
+        params.put("orderby","1");
         String html = "";
         try {
-            html = HttpUtils.httpGet(url);
-            Document doc = Jsoup.parse(html);
-            Elements pages = doc.select("p.pagenav a.page-numbers");
-            int pageNum = -1;
-            int size = pages.size();
-            if(size > 0){
-                Element lastPage = pages.last();
-                String text = lastPage.text();
-                pageNum = StringUtils.convertString2Int(text);
-            }
+            html = HttpUtils.httpPost(url,params);
+            int pageNum = paresePageNum(html);
             List<CrawlUrl> pageUrls = new ArrayList<>();
             if(pageNum > 0){
                 for(int i=0; i<pageNum; i++){
@@ -95,18 +91,55 @@ public class CrawlerServiceImpl implements ICrawlerService {
                     crawlUrl.setGrade(grade);
                     crawlUrl.setStatus(0);
                     crawlUrl.setSubject(subject);
-                    crawlUrl.setUrl("http://"+grade+subject+".cooco.net.cn/testpage/"+i+"/");
+                    crawlUrl.setUrl("http://"+coocograde+coocosubject+".cooco.net.cn/testpage/"+i+"/");
+                    crawlUrl.setKnowledgeId(knowlegeId);
+                    crawlUrl.setCoocoId(coocoId);
+                    crawlUrl.setCourseId(courseId);
+                    crawlUrl.setOriginFrom(originFrom);
                     pageUrls.add(crawlUrl);
                 }
             }
-            iCrawlUrlService.saveBatch(pageUrls);
+            if(pageUrls.size()>0){
+                iCrawlUrlService.saveBatch(pageUrls);
+            }else{
+                logger.info("coocoId="+coocoId+"没有获取到数据");
+            }
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info(e);
         }
         return html;
     }
 
-    List<CoocoQuestion> parseHtml(String html){
+    @Override
+    public String coocoAnalysisCrawl(String originFrom, String answerId) {
+        String res = "";
+        try{
+            String url = originFrom+"/answerdetail/"+answerId+"/";
+            String html = HttpUtils.httpPost(url,null);
+            if(!html.isEmpty()){
+                res = parseAnalysis(originFrom, html);
+            }
+        }catch (Exception e){
+            logger.info(e);
+            res = null;
+        }
+        return res;
+    }
+
+    int paresePageNum(String html){
+        Document doc = Jsoup.parse(html);
+        Elements pages = doc.select("p.pagenav a.page-numbers");
+        int pageNum = -1;
+        int size = pages.size();
+        if(size > 0){
+            Element lastPage = pages.last();
+            String text = lastPage.text();
+            pageNum = StringUtils.convertString2Int(text);
+        }
+        return pageNum;
+    }
+
+    List<CoocoQuestion> parseHtml(String html, String originFrom){
         List<CoocoQuestion> coocoQuestions = new ArrayList<>();
         String result = "";
         //
@@ -118,7 +151,7 @@ public class CrawlerServiceImpl implements ICrawlerService {
             Element img = allit.next();
             String src = img.attr("src");
             if(!src.contains("http"))
-                img.attr("src","http://czsx.cooco.net.cn"+src);
+                img.attr("src",originFrom+src);
         }
         result = doc.html();
 
@@ -197,30 +230,26 @@ public class CrawlerServiceImpl implements ICrawlerService {
         while(it.hasNext()){
             Element e = it.next();
             String tagName = e.tagName();
-            if((tagName.equals("div")&&!e.hasAttr("class"))||(!tagName.equals("div"))){
-                //Pattern pattern = Pattern.compile(".*[A-Z]+.*[A-Z]+.*");
-                //Matcher m = pattern.matcher(text);
-                stems.append(e.html());
+            String classValue = e.attr("class");
+            boolean attr = classValue.contains("title") || classValue.contains("bottom");
+            if(!attr ){
+                stems.append(e.toString());
             }
+            //if((tagName.equals("div")&&!e.hasAttr("class"))||(!tagName.equals("div"))){
+                //stems.append(e.html());
+            //}
         }
         return stems.toString();
     }
 
-    public List<EduQuestionBankBase> convertCoocoQuestion2Edu(List<CoocoQuestion> coocoQuestions, String gradeCode, String subjectCode){
+    public List<EduQuestionBankBase> convertCoocoQuestion2Edu(List<CoocoQuestion> coocoQuestions, String gradeCode, String subjectCode, String courseId, String courseSectionId, String originFrom){
         Date now = new Date();
         List<EduQuestionBankBase> eduQuestionBankBases = new ArrayList<>();
         for(CoocoQuestion cq : coocoQuestions){
             EduQuestionBankBase eq = new EduQuestionBankBase();
             eq.setAnswerId(cq.getAnswerId());
-            //获取知识点相关信息
-            String knowlege = cq.getKnowlege();
-            CourseSectionVo vo = Constants.csvMap.get(knowlege);
-            if(vo != null){
-                eq.setCourseId(vo.getParentId());
-                eq.setChapterId(vo.getId());
-            }else{
-                continue;
-            }
+            eq.setChapterId(courseSectionId);
+            eq.setCourseId(courseId);
 
             eq.setCreateBy(1);//创建人：系统管理员
             eq.setCreateTime(now);
@@ -231,9 +260,25 @@ public class CrawlerServiceImpl implements ICrawlerService {
             eq.setStem(cq.getQuestion());
             eq.setSubject(subjectCode);
             eq.setType(Constants.questiontypeMap.get(cq.getType()));
+            eq.setOriginFrom(originFrom);
 
             eduQuestionBankBases.add(eq);
         }
         return eduQuestionBankBases;
+    }
+
+    public String parseAnalysis(String originFrom,String html){
+        String res = "";
+        Document doc = Jsoup.parse(html);
+        Elements allImgs = doc.select("img");
+        Iterator<Element> allit = allImgs.iterator();
+        while(allit.hasNext()){
+            Element img = allit.next();
+            String src = img.attr("src");
+            if(!src.contains("http"))
+                img.attr("src",originFrom+src);
+        }
+        res = doc.html();
+        return res;
     }
 }

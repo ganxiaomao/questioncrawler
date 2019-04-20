@@ -33,6 +33,10 @@ public class CourseConstantInit implements CommandLineRunner {
     Resource questiontypeRes;
     @Value("classpath:data/subject.json")
     Resource subjectRes;
+    @Value("classpath:data/subject2cooco.json")
+    Resource subject2coocoRes;
+    @Value("classpath:data/grade2cooco.json")
+    Resource grade2coocoRes;
 
     @Override
     public void run(String... args) throws Exception {
@@ -41,30 +45,50 @@ public class CourseConstantInit implements CommandLineRunner {
         int size = Constants.csvMap.size();
         logger.info("知识点信息初始化，总共条数为："+size);
 
-        Constants.difficultMap.putAll(loadJsonFile(difficultRes));
-        Constants.gradeMap.putAll(loadJsonFile(gradeRes));
-        Constants.questiontypeMap.putAll(loadJsonFile(questiontypeRes));
-        Constants.subjectMap.putAll(loadJsonFile(subjectRes));
+        Constants.difficultMap.putAll(parseJson2Dict(loandJsonFile(difficultRes)));
+        Constants.gradeMap.putAll(parseJson2Dict(loandJsonFile(gradeRes)));
+        Constants.questiontypeMap.putAll(parseJson2Dict(loandJsonFile(questiontypeRes)));
+        Constants.subjectMap.putAll(parseJson2Dict(loandJsonFile(subjectRes)));
+        Constants.subject2CoocoMap.putAll(loadSubject2CoocoJsonFile(loandJsonFile(subject2coocoRes)));
+        Constants.grade2CoocoMap.putAll(loadSubject2CoocoJsonFile(loandJsonFile(grade2coocoRes)));
     }
 
-    private Map<String,String> loadJsonFile(Resource resource){
+    private JSONArray loandJsonFile(Resource resource){
         logger.info("开始加载"+resource.getFilename()+"文件");
-        Map<String,String> res = new HashMap<>();
+        JSONArray jsonArray = null;;
         try {
             String jsonStr = new String(IOUtils.readFully(resource.getInputStream(), -1, true));
-            JSONArray jsonArray = JSON.parseArray(jsonStr);
-            int size = jsonArray.size();
-            for(int i=0; i<size; i++){
-                JSONObject jo = jsonArray.getJSONObject(i);
-                String code = jo.getString("code");
-                String name = jo.getString("name");
-
-                res.put(name, code);
-            }
-        } catch (Exception e) {
+            jsonArray = JSON.parseArray(jsonStr);
+        }catch (Exception e) {
             logger.info(e);
         }
         logger.info("结束加载"+resource.getFilename()+"文件");
+        return jsonArray;
+    }
+
+    private Map<String,String> parseJson2Dict(JSONArray jsonArray){
+        Map<String,String> res = new HashMap<>();
+        int size = jsonArray.size();
+        for(int i=0; i<size; i++){
+            JSONObject jo = jsonArray.getJSONObject(i);
+            String code = jo.getString("code");
+            String name = jo.getString("name");
+
+            res.put(name, code);
+        }
+        return res;
+    }
+
+    private Map<String,String> loadSubject2CoocoJsonFile(JSONArray jsonArray){
+        Map<String,String> res = new HashMap<>();
+        int size = jsonArray.size();
+        for(int i=0; i<size; i++){
+            JSONObject jo = jsonArray.getJSONObject(i);
+            String code = jo.getString("code");
+            String cooco = jo.getString("cooco");
+
+            res.put(code, cooco);
+        }
         return res;
     }
 }

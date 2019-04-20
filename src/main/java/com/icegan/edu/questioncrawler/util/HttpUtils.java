@@ -16,10 +16,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class HttpUtils {
     private static final Logger logger = LogManager.getLogger(HttpUtils.class);
@@ -69,5 +66,20 @@ public class HttpUtils {
             httpClient.close();
         }
         return result;
+    }
+
+    public static void main(String[] args){
+        String url = "http://czwl.cooco.net.cn/testpage/1/";
+        Map<String,String> params = new HashMap<>();
+        params.put("lessonid","223");
+        params.put("difficult","0");
+        params.put("type","0");
+        params.put("orderby","1");
+        try {
+            String html = httpPost(url,params);
+            System.out.println(html);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

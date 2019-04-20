@@ -24,6 +24,18 @@ public class CrawlUrl extends Model<CrawlUrl> {
     @TableField("status")
     private Integer status;//0,未处理；1，抓取完成；-1，抓取失败。
 
+    @TableField("knowledge_id")
+    private String knowledgeId;
+
+    @TableField("course_id")
+    private String courseId;
+
+    @TableField("cooco_id")
+    private String coocoId;
+
+    @TableField("origin_from")
+    private String originFrom;
+
     public String getId() {
         return id;
     }
@@ -64,6 +76,38 @@ public class CrawlUrl extends Model<CrawlUrl> {
         this.status = status;
     }
 
+    public String getKnowledgeId() {
+        return knowledgeId;
+    }
+
+    public void setKnowledgeId(String knowledgeId) {
+        this.knowledgeId = knowledgeId;
+    }
+
+    public String getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(String courseId) {
+        this.courseId = courseId;
+    }
+
+    public String getCoocoId() {
+        return coocoId;
+    }
+
+    public void setCoocoId(String coocoId) {
+        this.coocoId = coocoId;
+    }
+
+    public String getOriginFrom() {
+        return originFrom;
+    }
+
+    public void setOriginFrom(String originFrom) {
+        this.originFrom = originFrom;
+    }
+
     @Override
     public String toString() {
         return "CrawlUrl{" +
@@ -72,6 +116,10 @@ public class CrawlUrl extends Model<CrawlUrl> {
                 ", subject='" + subject + '\'' +
                 ", grade='" + grade + '\'' +
                 ", status=" + status +
+                ", knowledgeId=" + knowledgeId +
+                ", courseId=" + courseId +
+                ", coocoId=" + coocoId +
+                ", originFrom=" + originFrom +
                 '}';
     }
 }

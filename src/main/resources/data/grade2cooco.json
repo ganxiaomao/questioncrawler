@@ -1,0 +1,14 @@
+[
+  {
+    "code": "grade_junior",
+    "cooco": "cz"
+  },
+  {
+    "code": "grade_high",
+    "cooco": "gz"
+  },
+  {
+    "code": "grade_primary",
+    "cooco": "xx"
+  }
+]

@@ -27,6 +27,8 @@ public class CommonDsServiceImpl implements ICommonDsService {
     public Map<String, CourseSectionVo> getAllCourseSection() {
         Map<String,CourseSectionVo> map = new HashMap<>();
         QueryWrapper<CourseSection> queryWrapper = new QueryWrapper<>();
+        QueryWrapper<Map<String,Object>> se = new QueryWrapper<>();
+
         List<CourseSection> courseSectionList = courseSectionMapper.selectList(queryWrapper.eq("1",1));
         for(CourseSection cs : courseSectionList){
             String id = cs.getId();
@@ -39,5 +41,11 @@ public class CommonDsServiceImpl implements ICommonDsService {
             map.put(name,vo);
         }
         return map;
+    }
+
+    @Override
+    public List<Map<String, Object>> getDatasBySubjectAndGradeFromCourseAndSection(String subject, String grade) {
+        List<Map<String,Object>> datas = courseSectionMapper.selectMapBySubjectAndGrade(subject, grade);
+        return datas;
     }
 }

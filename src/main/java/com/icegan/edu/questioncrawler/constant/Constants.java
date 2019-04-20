@@ -16,6 +16,8 @@ public class Constants {
     public static Map<String,String> gradeMap = new HashMap<>();//用于保存年级信息
     public static Map<String,String> questiontypeMap = new HashMap<>();//用于保存题目类型信息
     public static Map<String,String> subjectMap = new HashMap<>();//用于保存学科信息
+    public static Map<String,String> subject2CoocoMap = new HashMap<>();//用于保存系统的subject和cooco的subuject的对应信息
+    public static Map<String,String> grade2CoocoMap = new HashMap<>();//用于保存系统的grade和cooco的subuject的对应信息
 
     /**
      * biz_edu_question_bank_base表status的值，只针对cooco网的情况

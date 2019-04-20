@@ -61,6 +61,9 @@ public class CourseSection extends Model<CourseSection> {
      */
     private String updater;
 
+    @TableField("cooco_id")
+    private String coocoId;
+
 
     public String getId() {
         return id;
@@ -150,6 +153,14 @@ public class CourseSection extends Model<CourseSection> {
         this.updater = updater;
     }
 
+    public String getCoocoId() {
+        return coocoId;
+    }
+
+    public void setCoocoId(String coocoId) {
+        this.coocoId = coocoId;
+    }
+
     @Override
     protected Serializable pkVal() {
         return this.id;
@@ -169,6 +180,7 @@ public class CourseSection extends Model<CourseSection> {
                 ", updateTime=" + updateTime +
                 ", creator=" + creator +
                 ", updater=" + updater +
+                ", coocoId=" + coocoId +
                 "}";
     }
 }

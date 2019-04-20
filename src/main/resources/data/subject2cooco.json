@@ -1,0 +1,22 @@
+[
+  {
+    "code": "chinese",
+    "cooco": "yw"
+  },
+  {
+    "code": "math",
+    "cooco": "sx"
+  },
+  {
+    "code": "english",
+    "cooco": "yy"
+  },
+  {
+    "code": "physics",
+    "cooco": "wl"
+  },
+  {
+    "code": "chemical",
+    "cooco": "hx"
+  }
+]
