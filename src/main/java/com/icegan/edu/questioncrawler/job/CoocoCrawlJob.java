@@ -35,7 +35,7 @@ public class CoocoCrawlJob {
      * 该函数执行完成后5s后，再次执行该任务
      * initialDelay一定要有这个延迟，因为初始加载数据的时候，会晚于这个任务执行，导致运行时Constants里的数据都为空，延迟的时间自己估算，尽量等于或大于系统完全启动的时间
      */
-    //@Scheduled(initialDelay = 30000,fixedDelay = 5000)
+    @Scheduled(initialDelay = 30000,fixedDelay = 5000)
     public void crawlQuestion(){
         try{
             logger.info("====开始执行Cooco网站题目抓取任务====");
@@ -54,11 +54,11 @@ public class CoocoCrawlJob {
                 iCrawlUrlService.updateStatusById(-1,crawlUrl.getId());
             }
         } catch(Exception e){
-            logger.info("===执行Cooco网站题目抓取任务出错====\n"+e);
+            logger.info("===执行Cooco网站题目抓取任务出错====\n",e.getCause());
         }
     }
 
-    @Scheduled(initialDelay = 30000,fixedDelay = 5000)
+    //@Scheduled(initialDelay = 30000,fixedDelay = 5000)
     public void crawlQuestionAnalysis(){
         try{
             List<String> successIds = new ArrayList<>();

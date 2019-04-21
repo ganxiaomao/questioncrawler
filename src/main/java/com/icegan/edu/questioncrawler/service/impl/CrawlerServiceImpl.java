@@ -52,7 +52,7 @@ public class CrawlerServiceImpl implements ICrawlerService {
             eduQuestionBankBases = convertCoocoQuestion2Edu(coocoQuestions, grade, subject, courseId, courseSectionId, originFrom);
         } catch (Exception e) {
             eduQuestionBankBases = null;//失败
-            logger.info(e);
+            e.printStackTrace();
         }
         return eduQuestionBankBases;
     }
@@ -158,66 +158,71 @@ public class CrawlerServiceImpl implements ICrawlerService {
         Elements elements = doc.select("ul[id=test]").select("li");
         Iterator<Element> it = elements.iterator();
         while(it.hasNext()){
-            CoocoQuestion coocoQuestion = new CoocoQuestion();
-            Element element = it.next();
+            try{
+                CoocoQuestion coocoQuestion = new CoocoQuestion();
+                Element element = it.next();
 
-            Elements txts = element.select("div[class=txt]");
-            Elements titles = txts.select("div[class=title]");
-            Elements ps = txts.select("p");
-            Elements spans = txts.select("div[class=bottom]").select("span");
-
-
-            Element divImg = titles.get(0).select("div").get(0);//取难易度
-            Element from = titles.get(1).select("span").get(0);//获取题目来源
-            coocoQuestion.setFrom(from.text());
-
-            String stem = extractStem(txts.first());//获取题干
-            coocoQuestion.setQuestion(stem);
+                Elements txts = element.select("div[class=txt]");
+                Elements titles = txts.select("div[class=title]");
+                Elements ps = txts.select("p");
+                Elements spans = element.select("div[class=bottom]").select("span");
 
 
-            Element answer = txts.select("div[class=daan]").get(0);//获取答案id
-            String[] splits = answer.attr("id").split("-");
-            coocoQuestion.setAnswerId(splits[1]);
+                Element divImg = titles.get(0).select("div").get(0);//取难易度
+                Element from = titles.get(1).select("span").get(0);//获取题目来源
+                coocoQuestion.setFrom(from.text());
 
-            Element questionType = spans.get(1);//获取题目类型
-            coocoQuestion.setType(questionType.text().replaceAll("&nbsp;",""));
+                String stem = extractStem(txts.first());//获取题干
+                coocoQuestion.setQuestion(stem);
+                logger.info(txts.html());
 
-            Element knowlege = spans.get(2);//获取知识点
-            coocoQuestion.setKnowlege(knowlege.text());
+                Element answer = element.select("div[class=daan]").get(0);//获取答案id
+                String[] splits = answer.attr("id").split("-");
+                coocoQuestion.setAnswerId(splits[1]);
 
-            Elements imgs = divImg.select("img");
-            Iterator<Element> imgit = imgs.iterator();
+                Element questionType = spans.get(1);//获取题目类型
+                coocoQuestion.setType(questionType.text().replaceAll("&nbsp;",""));
 
-            int totalHard = 0;
-            while(imgit.hasNext()){
-                Element img = imgit.next();
-                String src = img.attr("src");
-                if(src.contains("nsts")){
-                    totalHard+=1;
+                //Element knowlege = spans.get(2);//获取知识点
+                //coocoQuestion.setKnowlege(knowlege.text());
+
+                Elements imgs = divImg.select("img");
+                Iterator<Element> imgit = imgs.iterator();
+
+                int totalHard = 0;
+                while(imgit.hasNext()){
+                    Element img = imgit.next();
+                    String src = img.attr("src");
+                    if(src.contains("nsts")){
+                        totalHard+=1;
+                    }
                 }
+                //基础、容易，中等、偏难、很难
+                String difficult = "";
+                switch (totalHard){
+                    case 1:
+                        difficult="基础";
+                        break;
+                    case 2:
+                        difficult="容易";
+                        break;
+                    case 3:
+                        difficult="中等";
+                        break;
+                    case 4:
+                        difficult="偏难";
+                        break;
+                    case 5:
+                        difficult="很难";
+                        break;
+                }
+                coocoQuestion.setDifficult(difficult);
+                //logger.info("题目信息="+coocoQuestion.toString());
+                coocoQuestions.add(coocoQuestion);
+            }catch (Exception e){
+                logger.info("error",e.getCause());
             }
-            //基础、容易，中等、偏难、很难
-            String difficult = "";
-            switch (totalHard){
-                case 1:
-                    difficult="基础";
-                    break;
-                case 2:
-                    difficult="容易";
-                    break;
-                case 3:
-                    difficult="中等";
-                    break;
-                case 4:
-                    difficult="偏难";
-                    break;
-                case 5:
-                    difficult="很难";
-                    break;
-            }
-            coocoQuestion.setDifficult(difficult);
-            logger.info("题目信息="+coocoQuestion.toString());
-            coocoQuestions.add(coocoQuestion);
+
         }
         logger.info("题目数量="+coocoQuestions.size());
         return coocoQuestions;
