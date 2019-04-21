@@ -110,6 +110,7 @@ public class CrawlerServiceImpl implements ICrawlerService {
                 logger.info("coocoId="+coocoId+"没有获取到数据");
             }
         } catch (Exception e) {
+            html = "error";
             logger.info(e);
         }
         return html;
@@ -337,17 +338,20 @@ public class CrawlerServiceImpl implements ICrawlerService {
             String key = entry.getKey();
             List<JSONObject> value = entry.getValue();
             //父节点一个个保存
-            CourseSection parent = arrange2CourseSection(now, null, key, courseId);
+            CourseSection parent = arrange2CourseSection(now, null, key, courseId,"");
             iCourseSectionService.save(parent);
             String parentId = parent.getId();
             //生成子节点
-            CourseSection child = arrange2CourseSection(now, parentId, key, courseId);
-            children.add(child);
+            for(JSONObject jo : value){
+                CourseSection child = arrange2CourseSection(now, parentId, jo.getString("label"), courseId, jo.getString("id"));
+                children.add(child);
+            }
+
         }
         iCourseSectionService.saveBatch(children);
     }
 
-    private CourseSection arrange2CourseSection(Date time, String parentId, String name, String courseId){
+    private CourseSection arrange2CourseSection(Date time, String parentId, String name, String courseId, String coocoId){
         CourseSection cs = new CourseSection();
         cs.setCourseId(courseId);
         cs.setCreateTime(time);
@@ -360,8 +364,11 @@ public class CrawlerServiceImpl implements ICrawlerService {
         if(parentId != null && !parentId.isEmpty()){
             cs.setIlevel(1);//第二级
             cs.setParentId(parentId);
+            cs.setStatus(1);//第二级需要抓取
+            cs.setCoocoId(coocoId);
         }else{
             cs.setIlevel(0);//第一级
+            cs.setStatus(0);//第一级不需要抓取
         }
         return cs;
     }

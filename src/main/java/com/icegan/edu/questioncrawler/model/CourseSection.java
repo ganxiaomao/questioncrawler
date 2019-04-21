@@ -64,6 +64,8 @@ public class CourseSection extends Model<CourseSection> {
     @TableField("cooco_id")
     private String coocoId;
 
+    private Integer status;
+
 
     public String getId() {
         return id;
@@ -161,6 +163,14 @@ public class CourseSection extends Model<CourseSection> {
         this.coocoId = coocoId;
     }
 
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
     @Override
     protected Serializable pkVal() {
         return this.id;
@@ -181,6 +191,7 @@ public class CourseSection extends Model<CourseSection> {
                 ", creator=" + creator +
                 ", updater=" + updater +
                 ", coocoId=" + coocoId +
+                ", status=" + status +
                 "}";
     }
 }

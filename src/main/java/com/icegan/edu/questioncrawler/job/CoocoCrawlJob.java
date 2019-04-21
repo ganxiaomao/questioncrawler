@@ -58,7 +58,7 @@ public class CoocoCrawlJob {
         }
     }
 
-    @Scheduled(initialDelay = 30000,fixedDelay = 5000)
+    //@Scheduled(initialDelay = 30000,fixedDelay = 5000)
     public void crawlQuestionAnalysis(){
         try{
             List<String> successIds = new ArrayList<>();

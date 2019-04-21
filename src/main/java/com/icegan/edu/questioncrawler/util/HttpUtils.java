@@ -57,9 +57,10 @@ public class HttpUtils {
         HttpGet httpGet = new HttpGet(url);
         CloseableHttpResponse response = null;
         try {
+            httpGet.addHeader("User-Agent","Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31");
             response = httpClient.execute(httpGet);
             HttpEntity entity = response.getEntity();
-            result= EntityUtils.toString(entity);
+            result= EntityUtils.toString(entity,"UTF-8");
         } catch (IOException e) {
             e.printStackTrace();
         } finally {

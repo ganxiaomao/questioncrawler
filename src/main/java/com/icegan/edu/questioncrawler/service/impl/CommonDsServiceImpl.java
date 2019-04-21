@@ -44,8 +44,8 @@ public class CommonDsServiceImpl implements ICommonDsService {
     }
 
     @Override
-    public List<Map<String, Object>> getDatasBySubjectAndGradeFromCourseAndSection(String subject, String grade) {
-        List<Map<String,Object>> datas = courseSectionMapper.selectMapBySubjectAndGrade(subject, grade);
+    public List<Map<String, Object>> getDatasBySubjectAndGradeFromCourseAndSection(String subject, String grade, Integer status) {
+        List<Map<String,Object>> datas = courseSectionMapper.selectMapBySubjectAndGrade(subject, grade, status);
         return datas;
     }
 }
