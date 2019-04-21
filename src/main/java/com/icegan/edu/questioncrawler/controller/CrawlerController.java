@@ -42,4 +42,10 @@ public class CrawlerController {
         }
         return "";
     }
+
+    @RequestMapping("/crawlknowledge")
+    public String crawlKnowledge(@RequestParam(name = "jsName",required = true) String jsName, @RequestParam(name = "courseId",required = true) String courseId){
+        String res = iCrawlerService.coocoKnowledgeCrawl(jsName, courseId);
+        return res;
+    }
 }

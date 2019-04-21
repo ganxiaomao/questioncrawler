@@ -1,9 +1,13 @@
 package com.icegan.edu.questioncrawler.service.impl;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.icegan.edu.questioncrawler.constant.Constants;
 import com.icegan.edu.questioncrawler.model.CoocoQuestion;
+import com.icegan.edu.questioncrawler.model.CourseSection;
 import com.icegan.edu.questioncrawler.model.CrawlUrl;
 import com.icegan.edu.questioncrawler.model.EduQuestionBankBase;
+import com.icegan.edu.questioncrawler.service.ICourseSectionService;
 import com.icegan.edu.questioncrawler.service.ICrawlUrlService;
 import com.icegan.edu.questioncrawler.service.ICrawlerService;
 import com.icegan.edu.questioncrawler.util.HttpUtils;
@@ -29,8 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,6 +44,8 @@ public class CrawlerServiceImpl implements ICrawlerService {
 
     @Autowired
     private ICrawlUrlService iCrawlUrlService;
+    @Autowired
+    private ICourseSectionService iCourseSectionService;
 
     @Override
     public List<EduQuestionBankBase> coocoCrawler(String url, String grade, String subject, String courseId, String courseSectionId, String originFrom) {
@@ -124,6 +129,43 @@ public class CrawlerServiceImpl implements ICrawlerService {
             res = null;
         }
         return res;
+    }
+
+    @Override
+    public String coocoKnowledgeCrawl(String jsName, String courseId) {
+        String url = "http://img.cooco.net.cn/site_media/"+jsName+".js";
+        String html = "";
+        try {
+            html = HttpUtils.httpGet(url);
+            InputStreamReader reader = new InputStreamReader(new ByteArrayInputStream(html.getBytes()),"utf-8");
+            BufferedReader br = new BufferedReader(reader);
+            String line = "";
+            String lastKey = "";
+            Map<String, List<JSONObject>> knowledgeMap = new HashMap<>();
+            while((line=br.readLine()) != null){
+                if(line.contains("ahmedDocs =")){
+                    int left = line.indexOf("\"");
+                    int right = line.indexOf(",");
+                    lastKey = line.substring(left+1, right-1);
+                    knowledgeMap.put(lastKey, new ArrayList<>());
+                }else if(line.contains("myobj =")){
+                    int left = line.indexOf("{");
+                    int right = line.indexOf("}");
+                    String res = line.substring(left,right+1);
+                    JSONObject jo = JSON.parseObject(res);
+                    List<JSONObject> value = knowledgeMap.get(lastKey);
+                    value.add(jo);
+                }
+            }
+            br.close();
+            reader.close();
+            //知识点处理
+            Iterator<Map.Entry<String, List<JSONObject>>> it = knowledgeMap.entrySet().iterator();
+            parseKnowledge(it, courseId);
+        } catch (IOException e) {
+            logger.info("error:",e.getCause());
+        }
+        return html;
     }
 
     int paresePageNum(String html){
@@ -285,5 +327,42 @@ public class CrawlerServiceImpl implements ICrawlerService {
         }
         res = doc.html();
         return res;
+    }
+
+    public void parseKnowledge(Iterator<Map.Entry<String, List<JSONObject>>> it, String courseId){
+        Date now = new Date();
+        List<CourseSection> children = new ArrayList<>();
+        while(it.hasNext()){
+            Map.Entry<String, List<JSONObject>> entry = it.next();
+            String key = entry.getKey();
+            List<JSONObject> value = entry.getValue();
+            //父节点一个个保存
+            CourseSection parent = arrange2CourseSection(now, null, key, courseId);
+            iCourseSectionService.save(parent);
+            String parentId = parent.getId();
+            //生成子节点
+            CourseSection child = arrange2CourseSection(now, parentId, key, courseId);
+            children.add(child);
+        }
+        iCourseSectionService.saveBatch(children);
+    }
+
+    private CourseSection arrange2CourseSection(Date time, String parentId, String name, String courseId){
+        CourseSection cs = new CourseSection();
+        cs.setCourseId(courseId);
+        cs.setCreateTime(time);
+        cs.setCreator("admin");//
+
+        cs.setName(name);
+        cs.setSortStr("002");
+        cs.setUpdater("admin");
+        cs.setUpdateTime(time);
+        if(parentId != null && !parentId.isEmpty()){
+            cs.setIlevel(1);//第二级
+            cs.setParentId(parentId);
+        }else{
+            cs.setIlevel(0);//第一级
+        }
+        return cs;
     }
 }

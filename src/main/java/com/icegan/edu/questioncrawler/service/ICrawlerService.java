@@ -23,4 +23,6 @@ public interface ICrawlerService {
      * @return
      */
     String coocoAnalysisCrawl(String originFrom, String answerId);
+
+    String coocoKnowledgeCrawl(String jsName, String courseId);
 }
