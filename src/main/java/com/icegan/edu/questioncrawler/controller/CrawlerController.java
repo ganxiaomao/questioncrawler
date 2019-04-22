@@ -52,8 +52,10 @@ public class CrawlerController {
             }
         }
         //批量更新状态
-        if(!ids.isEmpty())
+        if(!ids.isEmpty()){
             iCourseSectionService.updateStatusByIds(0, ids);
+        }
+
         return "";
     }
 

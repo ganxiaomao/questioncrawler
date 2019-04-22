@@ -80,6 +80,7 @@ public class CrawlerServiceImpl implements ICrawlerService {
         String coocosubject = Constants.subject2CoocoMap.get(subject);
         String originFrom = "http://"+coocograde+coocosubject+".cooco.net.cn";//最后不以/结尾，是为了图片地址完善方便
         String url = originFrom+"/testpage/1/";
+        logger.info("===开始分析待抓取题库的页面地址："+url);
         Map<String,String> params = new HashMap<>();
         params.put("lessonid",coocoId);
         params.put("difficult","0");
@@ -105,6 +106,7 @@ public class CrawlerServiceImpl implements ICrawlerService {
                 }
             }
             if(pageUrls.size()>0){
+                logger.info("===coocoId="+coocoId+",总共待抓取题库的地址有"+pageUrls.size()+"条");
                 iCrawlUrlService.saveBatch(pageUrls);
             }else{
                 logger.info("coocoId="+coocoId+"没有获取到数据");
@@ -135,6 +137,7 @@ public class CrawlerServiceImpl implements ICrawlerService {
     @Override
     public String coocoKnowledgeCrawl(String jsName, String courseId) {
         String url = "http://img.cooco.net.cn/site_media/"+jsName+".js";
+        logger.info("===开始抓取知识点，地址为："+url);
         String html = "";
         try {
             html = HttpUtils.httpGet(url);
@@ -166,6 +169,7 @@ public class CrawlerServiceImpl implements ICrawlerService {
         } catch (IOException e) {
             logger.info("error:",e.getCause());
         }
+        logger.info("===知识点抓取完毕===");
         return html;
     }
 

@@ -4,9 +4,9 @@ spring:
   datasource:
     druid:
       driver-class-name: com.mysql.cj.jdbc.Driver #com.mysql.jdbc.Driver
-      url: jdbc:mysql://localhost:3306/guns?autoReconnect=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      url: jdbc:mysql://172.27.0.9:3306/guns?autoReconnect=true&useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=CONVERT_TO_NULL&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       username: root
-      password: a123456789 #172.27.0.9 eduoscar
+      password: eduoscar #172.27.0.9 eduoscar
       initial-size: 5
       max-active: 5
       db-type: com.alibaba.druid.pool.DruidDataSource
@@ -20,6 +20,8 @@ mybatis-plus:
   type-aliases-package: com.icegan.edu.questioncrawler.model
 logging:
   config: classpath:log4j2.xml
+  level:
+    com.icegan.edu.questioncrawler.dao: debug
 mybatis:
   configuration:
     log-impl: org.apache.ibatis.logging.log4j2.Log4j2Impl
