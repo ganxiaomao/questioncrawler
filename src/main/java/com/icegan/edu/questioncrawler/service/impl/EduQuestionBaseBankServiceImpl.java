@@ -31,4 +31,16 @@ public class EduQuestionBaseBankServiceImpl extends ServiceImpl<EduQuestionBankB
         this.baseMapper.update(null,updateWrapper.set("status",status).in("id",ids));
         return true;
     }
+
+    @Override
+    public List<EduQuestionBankBase> selectDatasByOffsetAndLimit(int offset, int limit) {
+        QueryWrapper<EduQuestionBankBase> queryWrapper  = new QueryWrapper<>();
+        List<EduQuestionBankBase> datas = this.baseMapper.selectList(queryWrapper.last("limit "+offset+","+limit));
+        return datas;
+    }
+
+    @Override
+    public boolean clearStemFiled(List<String> ids) {
+        return false;
+    }
 }

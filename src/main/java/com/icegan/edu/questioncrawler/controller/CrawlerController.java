@@ -1,9 +1,11 @@
 package com.icegan.edu.questioncrawler.controller;
 
 import com.icegan.edu.questioncrawler.job.CoocoCrawlJob;
-import com.icegan.edu.questioncrawler.service.ICommonDsService;
-import com.icegan.edu.questioncrawler.service.ICourseSectionService;
-import com.icegan.edu.questioncrawler.service.ICrawlerService;
+import com.icegan.edu.questioncrawler.model.EduQuestionBankBase;
+import com.icegan.edu.questioncrawler.model.EduQuestionStem;
+import com.icegan.edu.questioncrawler.service.*;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +18,7 @@ import java.util.Map;
 
 @RestController
 public class CrawlerController {
+    private static final Logger logger = LogManager.getLogger(CrawlerController.class);
 
     @Autowired
     private ICrawlerService iCrawlerService;
@@ -28,6 +31,12 @@ public class CrawlerController {
 
     @Autowired
     private ICourseSectionService iCourseSectionService;
+
+    @Autowired
+    private IEduQuestionBaseBankService iEduQuestionBaseBankService;
+
+    @Autowired
+    private IEduQuestionStemService iEduQuestionStemService;
 
     @RequestMapping("/hello")
     public String index(@RequestParam(name = "subject",required = false) String subject){
@@ -63,5 +72,35 @@ public class CrawlerController {
     public String crawlKnowledge(@RequestParam(name = "jsName",required = true) String jsName, @RequestParam(name = "courseId",required = true) String courseId){
         String res = iCrawlerService.coocoKnowledgeCrawl(jsName, courseId);
         return res;
+    }
+
+    @RequestMapping("/transStem")
+    public void transStem(){
+        //
+        int offset = 0;
+        int limit = 10;
+        while(true){
+            List<EduQuestionBankBase> datas = iEduQuestionBaseBankService.selectDatasByOffsetAndLimit(offset,limit);
+            int size = datas.size();
+            if(size > 0){
+                //
+                List<EduQuestionStem> stems = new ArrayList<>();
+                List<String> ids = new ArrayList<>();
+                for(EduQuestionBankBase data : datas){
+                    EduQuestionStem stem = new EduQuestionStem();
+                    stem.setQuestionBaseId(data.getId());
+                    stem.setStatus(0);
+                    stem.setStem(data.getStem());
+                    stems.add(stem);
+                    ids.add(data.getId());
+                }
+                iEduQuestionStemService.saveBatch(stems);
+                logger.info("数据迁移，ids="+ids.toString()+"处理完毕");
+                offset += 1;
+            }else{
+                logger.info("stem字段整理工作结束");
+                break;
+            }
+        }
     }
 }

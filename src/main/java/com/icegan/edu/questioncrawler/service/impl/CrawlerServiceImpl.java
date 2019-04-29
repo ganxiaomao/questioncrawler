@@ -123,6 +123,7 @@ public class CrawlerServiceImpl implements ICrawlerService {
         String res = "";
         try{
             String url = originFrom+"/answerdetail/"+answerId+"/";
+            logger.info("===开始抓取url="+url+"的答案解析====");
             String html = HttpUtils.httpPost(url,null);
             if(!html.isEmpty()){
                 res = parseAnalysis(originFrom, html);

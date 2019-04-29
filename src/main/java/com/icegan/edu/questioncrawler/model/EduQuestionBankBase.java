@@ -26,6 +26,7 @@ public class EduQuestionBankBase extends Model<EduQuestionBankBase> {
     /**
      * 题干
      */
+    @TableField(exist = false)
     private String stem;
     /**
      * 题目类型

@@ -4,10 +4,7 @@ import com.icegan.edu.questioncrawler.constant.Constants;
 import com.icegan.edu.questioncrawler.model.CrawlUrl;
 import com.icegan.edu.questioncrawler.model.EduQuestionAnalysis;
 import com.icegan.edu.questioncrawler.model.EduQuestionBankBase;
-import com.icegan.edu.questioncrawler.service.ICrawlUrlService;
-import com.icegan.edu.questioncrawler.service.ICrawlerService;
-import com.icegan.edu.questioncrawler.service.IEduQuestionAnalysisService;
-import com.icegan.edu.questioncrawler.service.IEduQuestionBaseBankService;
+import com.icegan.edu.questioncrawler.service.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +26,8 @@ public class CoocoCrawlJob {
     private IEduQuestionBaseBankService iEduQuestionBaseBankService;
     @Autowired
     private IEduQuestionAnalysisService iEduQuestionAnalysisService;
+    @Autowired
+    private IEduQuestionStemService iEduQuestionStemService;
 
     /**
      * 定时抓取cooco网站的题目。
@@ -48,6 +47,8 @@ public class CoocoCrawlJob {
             if(eduQuestionBankBases != null){
                 //保存抓取到的题目
                 iEduQuestionBaseBankService.saveBatch(eduQuestionBankBases);
+                //保存题干
+                iEduQuestionStemService.batchInsert(eduQuestionBankBases);
                 //更新记录状态为抓取完毕
                 iCrawlUrlService.updateStatusById(1,crawlUrl.getId());
             }else{
@@ -95,7 +96,7 @@ public class CoocoCrawlJob {
                 iEduQuestionAnalysisService.saveBatch(eduQuestionAnalyses);
             }
         }catch(Exception e){
-            logger.info(e);
+            logger.info("error:",e.getCause());
         }
     }
 }

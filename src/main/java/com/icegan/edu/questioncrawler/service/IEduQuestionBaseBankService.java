@@ -22,4 +22,13 @@ public interface IEduQuestionBaseBankService extends IService<EduQuestionBankBas
      * @return
      */
     public boolean updateStatusByIds(Integer status, List<String> ids);
+
+    public List<EduQuestionBankBase> selectDatasByOffsetAndLimit(int offset, int limit);
+
+    /**
+     * 清空stem字段
+     * @param ids
+     * @return
+     */
+    public boolean clearStemFiled(List<String> ids);
 }
