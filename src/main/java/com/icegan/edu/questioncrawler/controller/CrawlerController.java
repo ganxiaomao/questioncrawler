@@ -7,6 +7,8 @@ import com.icegan.edu.questioncrawler.service.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -102,5 +104,10 @@ public class CrawlerController {
                 break;
             }
         }
+    }
+
+    @RequestMapping("/extractImageUrl")
+    public void extractImageUrl(@RequestParam("where") String where){
+        //
     }
 }

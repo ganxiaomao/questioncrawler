@@ -14,4 +14,25 @@
     <sql id="Base_Column_List">
         id, question_base_id, stem, status
     </sql>
+
+    <update id="updateBatch" parameterType="java.util.List">
+        update biz_edu_question_stem
+        <trim prefix="set" suffixOverrides=",">
+            <trim prefix="status =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id=#{item.id} then #{item.status}
+                </foreach>
+            </trim>
+            <trim prefix="stem =case" suffix="end,">
+                <foreach collection="list" item="item" index="index">
+                    when id=#{item.id} then #{item.stem}
+                </foreach>
+                else default_value
+            </trim>
+        </trim>
+        where id in
+        <foreach collection="list" index="index" item="item" separator="," open="(" close=")">
+            #{item.id}
+        </foreach>
+    </update>
 </mapper>

@@ -4,6 +4,7 @@ import com.icegan.edu.questioncrawler.constant.Constants;
 import com.icegan.edu.questioncrawler.model.CrawlUrl;
 import com.icegan.edu.questioncrawler.model.EduQuestionAnalysis;
 import com.icegan.edu.questioncrawler.model.EduQuestionBankBase;
+import com.icegan.edu.questioncrawler.model.EduQuestionStem;
 import com.icegan.edu.questioncrawler.service.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -34,7 +35,7 @@ public class CoocoCrawlJob {
      * 该函数执行完成后5s后，再次执行该任务
      * initialDelay一定要有这个延迟，因为初始加载数据的时候，会晚于这个任务执行，导致运行时Constants里的数据都为空，延迟的时间自己估算，尽量等于或大于系统完全启动的时间
      */
-    @Scheduled(initialDelay = 30000,fixedDelay = 5000)
+    //@Scheduled(initialDelay = 30000,fixedDelay = 5000)
     public void crawlQuestion(){
         try{
             CrawlUrl crawlUrl = iCrawlUrlService.selectOneByStatus(0,-1);//获取一条未处理或者失败的连接记录
@@ -59,15 +60,16 @@ public class CoocoCrawlJob {
         }
     }
 
-    //@Scheduled(initialDelay = 30000,fixedDelay = 5000)
+    //@Scheduled(initialDelay = 30000,fixedDelay = 8000)
     public void crawlQuestionAnalysis(){
+        logger.info("=======开始题目解答的抓取任务======");
         try{
             List<String> successIds = new ArrayList<>();
             List<String> failIds = new ArrayList<>();
             List<EduQuestionAnalysis> eduQuestionAnalyses = new ArrayList<>();
             //从questionbankbase表中查找已经完成题干抓取的数据
             List<EduQuestionBankBase> eduQuestionBankBases = iEduQuestionBaseBankService.selectDatasByStatusesAndLimit(
-                    10,
+                    15,
                     Constants.cooco_crawl_question_status_stem_ok,
                     Constants.cooco_crawl_question_status_answer_fail);
             for(EduQuestionBankBase eqb : eduQuestionBankBases){
@@ -90,13 +92,32 @@ public class CoocoCrawlJob {
             if(!successIds.isEmpty())
                 iEduQuestionBaseBankService.updateStatusByIds(Constants.cooco_crawl_question_status_answer_ok,successIds);
             if(!failIds.isEmpty())
-                iEduQuestionBaseBankService.updateStatusByIds(Constants.cooco_crawl_question_status_answer_fail,null);
+                iEduQuestionBaseBankService.updateStatusByIds(Constants.cooco_crawl_question_status_answer_fail,failIds);
             if(!eduQuestionAnalyses.isEmpty()){
                 //批量保存解析
                 iEduQuestionAnalysisService.saveBatch(eduQuestionAnalyses);
             }
+            int size = eduQuestionBankBases.size();
+            if(size < 15){
+                logger.info("=======结束题目解答的抓取任务，自动关闭程序！======");
+                System.exit(0);
+            }
         }catch(Exception e){
             logger.info("error:",e.getCause());
         }
+    }
+
+    //@Scheduled(initialDelay = 30000,fixedDelay = 2000)
+    public void downloadImage(){
+        //先处理题干的图片
+        EduQuestionStem stem = iEduQuestionStemService.selectOneByStatus(1);
+        if(stem == null){
+            logger.info("题干图片下载任务完毕。");
+        }else{
+            //下载图片
+            iEduQuestionStemService.updateStemAndStatusById(0,"",stem.getId());
+            logger.info("获取成功");
+        }
+
     }
 }

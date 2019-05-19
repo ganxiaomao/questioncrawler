@@ -11,7 +11,9 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -42,5 +44,22 @@ public class EduQuestionBaseBankServiceImpl extends ServiceImpl<EduQuestionBankB
     @Override
     public boolean clearStemFiled(List<String> ids) {
         return false;
+    }
+
+    @Override
+    public List<EduQuestionBankBase> selectDatasBySubjectAndLimit(String subject,int offset, int limit) {
+        QueryWrapper<EduQuestionBankBase> queryWrapper  = new QueryWrapper<>();
+        List<EduQuestionBankBase> datas = this.baseMapper.selectList(queryWrapper.eq("subject",subject).last("limit "+offset+","+limit));
+        return datas;
+    }
+
+    @Override
+    public int shardInsert(List<EduQuestionBankBase> questions, String subject) {
+        //List<EduQuestionBankBase> temp = this.baseMapper.selectDatasBySubject(subject);
+        Map<String,Object> params = new HashMap<>();
+        params.put("subject",subject);
+        params.put("questions",questions);
+        this.baseMapper.insertBatch(subject,questions);
+        return 0;
     }
 }

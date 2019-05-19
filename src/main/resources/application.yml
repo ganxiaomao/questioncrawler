@@ -11,13 +11,13 @@ spring:
       max-active: 5
       db-type: com.alibaba.druid.pool.DruidDataSource
 
-
 mybatis-plus:
   global-config:
     db-config:
       id-type: uuid
-  mapper-locations: classpath*:**/mapper/*Mapper.xml  #写成classpath*:**/mapper/*.xml会把tomcat下的包含mapper路径的xml文件也囊括进来，所以要注意，或者最好给你的xml一个统一的后缀，比如**Mapper.xml
   type-aliases-package: com.icegan.edu.questioncrawler.model
+  mapper-locations: classpath*:**/mapper/*Mapper.xml  #写成classpath*:**/mapper/*.xml会把tomcat下的包含mapper路径的xml文件也囊括进来，所以要注意，或者最好给你的xml一个统一的后缀，比如**Mapper.xml
+
 logging:
   config: classpath:log4j2.xml
   level:
@@ -25,3 +25,6 @@ logging:
 mybatis:
   configuration:
     log-impl: org.apache.ibatis.logging.log4j2.Log4j2Impl
+jasypt:
+  encryptor:
+    password: icegan #加密的密钥

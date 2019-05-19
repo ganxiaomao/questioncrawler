@@ -9,7 +9,6 @@
         <result column="subject" property="subject" />
         <result column="grade" property="grade" />
         <result column="difficult" property="difficult" />
-        <result column="points" property="points" />
         <result column="course_id" property="courseId" />
         <result column="chapter_id" property="chapterId" />
         <result column="create_time" property="createTime" />
@@ -22,6 +21,33 @@
 
     <!-- 通用查询结果列 -->
     <sql id="Base_Column_List">
-        id, type, subject, grade, difficult, points, course_id, chapter_id, create_time, update_time, create_by, status, answer_id, origin_from
+        id, type, subject, grade, difficult, course_id, chapter_id, create_time, update_time, create_by, status, answer_id, origin_from
     </sql>
+
+<!--    <insert id="insertBatch" parameterType="java.util.Map">-->
+<!--        insert into biz_edu_question_bank_base_#{subject} (-->
+<!--        <include refid="Base_Column_List"></include>-->
+<!--        ) values-->
+<!--        <foreach collection="questions" item="item" index="index" separator=",">-->
+<!--            <trim prefix="(" suffix=")" suffixOverrides=",">-->
+<!--            #{item.id},-->
+<!--            #{item.type},-->
+<!--            #{item.subject},-->
+<!--            #{item.grade},-->
+<!--            #{item.difficult},-->
+<!--            #{item.courseId},-->
+<!--            #{item.chapterId},-->
+<!--            #{item.createTime},-->
+<!--            #{item.updateTime},-->
+<!--            #{item.createBy},-->
+<!--            #{item.status},-->
+<!--            #{item.answerId},-->
+<!--            #{item.originFrom}-->
+<!--            </trim>-->
+<!--        </foreach>-->
+<!--    </insert>-->
+
+<!--    <select id="selectDatasBySubject" parameterType="java.lang.String" resultMap="BaseResultMap">-->
+<!--        select * from biz_edu_question_bank_base_#{subject}-->
+<!--    </select>-->
 </mapper>

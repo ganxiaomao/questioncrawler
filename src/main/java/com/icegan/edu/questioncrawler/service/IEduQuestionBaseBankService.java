@@ -31,4 +31,8 @@ public interface IEduQuestionBaseBankService extends IService<EduQuestionBankBas
      * @return
      */
     public boolean clearStemFiled(List<String> ids);
+
+    public List<EduQuestionBankBase> selectDatasBySubjectAndLimit(String subject,int offset, int limit);
+
+    public int shardInsert(List<EduQuestionBankBase> questions, String subject);
 }
