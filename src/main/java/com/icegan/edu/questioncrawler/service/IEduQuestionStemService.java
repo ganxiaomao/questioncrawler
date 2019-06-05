@@ -17,4 +17,6 @@ public interface IEduQuestionStemService extends IService<EduQuestionStem> {
     EduQuestionStem selectOneByStatus(int status);
 
     boolean updateStemAndStatusById(int status, String stem, String id);
+
+    boolean updateStatusById(int status, String id);
 }

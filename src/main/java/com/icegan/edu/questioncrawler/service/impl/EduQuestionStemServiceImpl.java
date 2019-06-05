@@ -65,4 +65,11 @@ public class EduQuestionStemServiceImpl extends ServiceImpl<EduQuestionStemMappe
         this.baseMapper.update(null, updateWrapper.set("status",status).set("stem",stem).eq("id",id));
         return true;
     }
+
+    @Override
+    public boolean updateStatusById(int status, String id) {
+        UpdateWrapper<EduQuestionStem> updateWrapper = new UpdateWrapper<>();
+        this.baseMapper.update(null, updateWrapper.set("status",status).eq("id",id));
+        return true;
+    }
 }

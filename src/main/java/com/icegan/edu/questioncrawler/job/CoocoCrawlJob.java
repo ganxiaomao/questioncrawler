@@ -6,6 +6,7 @@ import com.icegan.edu.questioncrawler.model.EduQuestionAnalysis;
 import com.icegan.edu.questioncrawler.model.EduQuestionBankBase;
 import com.icegan.edu.questioncrawler.model.EduQuestionStem;
 import com.icegan.edu.questioncrawler.service.*;
+import com.icegan.edu.questioncrawler.util.ImageUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -107,16 +108,27 @@ public class CoocoCrawlJob {
         }
     }
 
-    //@Scheduled(initialDelay = 30000,fixedDelay = 2000)
+    @Scheduled(initialDelay = 30000,fixedDelay = 5000)
     public void downloadImage(){
         //先处理题干的图片
         EduQuestionStem stem = iEduQuestionStemService.selectOneByStatus(1);
         if(stem == null){
+            ImageUtils.closeCos();
             logger.info("题干图片下载任务完毕。");
         }else{
-            //下载图片
-            iEduQuestionStemService.updateStemAndStatusById(0,"",stem.getId());
-            logger.info("获取成功");
+            //先判断有没有图片
+            boolean hasImage = ImageUtils.hasImage(stem.getStem());
+            if(hasImage){
+                logger.info("本次下载图片的题干ID="+stem.getId());
+                //下载图片
+                String str = ImageUtils.extractImgByMd5(stem.getStem());
+                //stem.setStem(str);
+                iEduQuestionStemService.updateStemAndStatusById(0,str,stem.getId());
+                logger.info("题干ID="+stem.getId()+"图片下载成功");
+            }else{
+                iEduQuestionStemService.updateStatusById(0,stem.getId());
+                logger.info("题干ID="+stem.getId()+"无图片需要下载。");
+            }
         }
 
     }
