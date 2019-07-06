@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.icegan.edu.questioncrawler.dao.ColledgeMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.icegan.edu.questioncrawler.model.Colledge">
+        <id column="id" property="id" />
+        <result column="school_badge" property="schoolBadge" />
+        <result column="school_name" property="schoolName" />
+        <result column="school_province" property="schoolProvince" />
+        <result column="school_natrue" property="schoolNature" />
+        <result column="school_type" property="schoolType" />
+        <result column="school_level" property="schoolLevel" />
+        <result column="school_attribute" property="schoolAttribute" />
+        <result column="school_detail_url" property="schoolDetailUrl" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, school_badge, school_name, school_province, school_natrue, school_type, school_level, school_attribute, school_detail_url
+    </sql>
+</mapper>

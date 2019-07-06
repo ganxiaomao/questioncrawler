@@ -48,10 +48,11 @@ public class TestUtils {
     }
 
     public static void main(String[] args){
-        String html = "http://czwl.cooco.net.cndata:image/png;base64sdfsdfsdfsdfsfsdfsds";
+        String html = "http://czwl.cooco.net.cn/data:image/png;base64sdfsdfsdfsdfsfsdfsds";
         if(html.contains("data:image")){
-            int index = html.lastIndexOf("data:image");
-            System.out.println(html.substring(index));
+            int index = html.lastIndexOf("//")+2;
+            int end = html .indexOf("cooco.net.cn")-1;
+            System.out.println(html.substring(index,end));
         }
     }
 }

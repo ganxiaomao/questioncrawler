@@ -1,10 +1,7 @@
 package com.icegan.edu.questioncrawler.job;
 
 import com.icegan.edu.questioncrawler.constant.Constants;
-import com.icegan.edu.questioncrawler.model.CrawlUrl;
-import com.icegan.edu.questioncrawler.model.EduQuestionAnalysis;
-import com.icegan.edu.questioncrawler.model.EduQuestionBankBase;
-import com.icegan.edu.questioncrawler.model.EduQuestionStem;
+import com.icegan.edu.questioncrawler.model.*;
 import com.icegan.edu.questioncrawler.service.*;
 import com.icegan.edu.questioncrawler.util.ImageUtils;
 import org.apache.logging.log4j.LogManager;
@@ -20,6 +17,8 @@ import java.util.List;
 public class CoocoCrawlJob {
     private static final Logger logger = LogManager.getLogger(CoocoCrawlJob.class);
 
+    private static int current_index = 2;
+
     @Autowired
     private ICrawlUrlService iCrawlUrlService;
     @Autowired
@@ -30,6 +29,8 @@ public class CoocoCrawlJob {
     private IEduQuestionAnalysisService iEduQuestionAnalysisService;
     @Autowired
     private IEduQuestionStemService iEduQuestionStemService;
+    @Autowired
+    private IColledgeService iColledgeService;
 
     /**
      * 定时抓取cooco网站的题目。
@@ -108,7 +109,7 @@ public class CoocoCrawlJob {
         }
     }
 
-    @Scheduled(initialDelay = 30000,fixedDelay = 5000)
+    //@Scheduled(initialDelay = 30000,fixedDelay = 5000)
     public void downloadImage(){
         //先处理题干的图片
         EduQuestionStem stem = iEduQuestionStemService.selectOneByStatus(1);
@@ -121,7 +122,7 @@ public class CoocoCrawlJob {
             if(hasImage){
                 logger.info("本次下载图片的题干ID="+stem.getId());
                 //下载图片
-                String str = ImageUtils.extractImgByMd5(stem.getStem());
+                String str = ImageUtils.extractImgByMd5(stem.getStem(),"question/");
                 //stem.setStem(str);
                 iEduQuestionStemService.updateStemAndStatusById(0,str,stem.getId());
                 logger.info("题干ID="+stem.getId()+"图片下载成功");
@@ -130,6 +131,26 @@ public class CoocoCrawlJob {
                 logger.info("题干ID="+stem.getId()+"无图片需要下载。");
             }
         }
+    }
 
+    /**
+     * 从新东方网站爬取大学信息：http://gaokao.xdf.cn/college/china/searchSchool/_____
+     */
+    @Scheduled(initialDelay = 30000,fixedDelay = 5000)
+    private void crawlColledgeFromXdf(){
+        String urlPre = "http://gaokao.xdf.cn/college/china/searchSchool/_____";
+        int pageSize = 279;//默认
+        if(current_index <= pageSize){
+            String url = urlPre+current_index;
+            logger.info("当前分析高校信息的地址为："+url);
+            List<Colledge> colledges = iColledgeService.crawlColledgeByUrl(url);
+            if(!colledges.isEmpty()){
+                logger.info("抓取高校信息"+colledges.size()+"条！");
+                iColledgeService.saveBatch(colledges);
+            }
+            current_index++;
+        }else{
+            logger.info("高校信息抓取完毕！");
+        }
     }
 }

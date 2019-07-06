@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.extension.activerecord.Model;
 import java.io.Serializable;
 import java.util.Date;
 
-@TableName("biz_course_section")
+@TableName("biz_edu_course_section")
 public class CourseSection extends Model<CourseSection> {
     private static final long serialVersionUID = 1L;
 
